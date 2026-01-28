@@ -37,10 +37,9 @@ pipeline {
 
        stage('Deploy') {
     steps {
-        // 'k8s-credentials-id' is the ID of the Secret File or Kubeconfig stored in Jenkins
-        withKubeConfig([credentialsId: 'k8s-credentials-id']) {
             sh 'kubectl delete deployment flask-app --ignore-not-found'
-        }
+            sh ' kubectl create deployment flask-app \
+                  --image=675711/flask-k8s-app:latest'
     }
 }
 
