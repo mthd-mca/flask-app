@@ -35,7 +35,7 @@ stages{
   stage('kube depoly'){
      steps{
    	sh 'kubectl create deployment flask-app \
-                  --image=675711/flask-k8s-app:latest
+                  --image=675711/flask-app:latest
 	sh 'kubectl expose deployment flask-app --name=flask-app --type=NodePort --port=5000 --target-port=5000'	
     }
    }
