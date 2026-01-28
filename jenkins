@@ -35,22 +35,14 @@ pipeline {
             }
         }
 
-        stage('Deploy on Kubernetes (No YAML)') {
-            steps {
-                sh '''
-
-                kubectl create deployment flask-app \
-                  --image=675711/flask-app:latest
-
-                kubectl scale deployment flask-app --replicas=
-                kubectl expose deployment flask-app \
-                  --name=flask-service \
-                  --type=NodePort \
-                  --port=5000 \
-                  --target-port=5000
-                '''
-            }
+       stage('Deploy') {
+    steps {
+        // 'k8s-credentials-id' is the ID of the Secret File or Kubeconfig stored in Jenkins
+        withKubeConfig([credentialsId: 'k8s-credentials-id']) {
+            sh 'kubectl delete deployment flask-app --ignore-not-found'
         }
+    }
+}
 
         stage('Verify Deployment') {
             steps {
