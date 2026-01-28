@@ -3,7 +3,7 @@ pipeline{
 
  environment{
   img_name= "675711/flask-app"
-  docker_cred = dockerhub
+  docker_cred = 'dockerhub'
 }
 
 stages{
