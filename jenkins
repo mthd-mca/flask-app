@@ -1,0 +1,51 @@
+pipeline{
+ agent any
+
+ environment{
+  img_name= "675711/flask-app"
+  docker_cred = dockerhub
+}
+
+stages{
+  stage('checkout'){
+    steps{
+	git branch:'main',
+	url:'https://github.com/mthd-mca/flask-app.git'
+  }
+ }
+
+  stage('build docker'){
+   steps{
+	script{
+	  docker_img=docker.build(${img_name}:latest)
+	}
+    }
+  }
+
+  stage('push docker'){
+    steps{
+	script{
+	  docker.withRegistry('',docker_cred){
+		docker_img.push('latest')
+		}
+	}	
+     }
+  }
+
+  stage('kube depoly'){
+     steps{
+   	sh 'kubectl create deployment flask-app --image=${img_name}:latest'
+	sh 'kubectl expose deployment flask-app --name=flask-app --type=NodePort --port=5000 --target-port=5000'	
+    }
+   }
+
+   stage('verify'){
+	steps{
+	   sh 'kubectl get pods'
+	   sh 'kubectl get services'
+	 }
+   }
+
+} 
+
+}
