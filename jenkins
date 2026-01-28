@@ -35,13 +35,7 @@ pipeline {
             }
         }
 
-       stage('Deploy') {
-    steps {
-            sh 'kubectl delete deployment flask-app --ignore-not-found'
-            sh ' kubectl create deployment flask-app \
-                  --image=675711/flask-k8s-app:latest'
-    }
-}
+     
 
         stage('Verify Deployment') {
             steps {
