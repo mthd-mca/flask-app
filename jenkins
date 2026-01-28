@@ -38,9 +38,6 @@ pipeline {
         stage('Deploy on Kubernetes (No YAML)') {
             steps {
                 sh '''
-        
-                kubectl delete deployment flask-app --ignore-not-found
-                kubectl delete service flask-service --ignore-not-found
 
                 kubectl create deployment flask-app \
                   --image=675711/flask-app:latest
