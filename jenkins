@@ -1,64 +1,77 @@
-pipeline{
- agent any
+pipeline {
+    agent any
 
- environment{
-  img_name= "675711/flask-app"
-  docker_cred = 'dockerhub'
-}
-
-stages{
-  stage('checkout'){
-    steps{
-	git branch:'main',
-	url:'https://github.com/mthd-mca/flask-app.git'
-  }
- }
-
-  stage('build docker'){
-   steps{
-	script{
-	  docker_img=docker.build("${img_name}:latest")
-	}
+    environment {
+        IMAGE_NAME = "675711/flask-app"
+        DOCKERHUB_CREDENTIALS = 'dockerhub'
+        DEPLOYMENT_NAME = "flask-app"
+        SERVICE_NAME = "flask-service"
     }
-  }
 
-  stage('push docker'){
-    steps{
-	script{
-	  docker.withRegistry('',docker_cred){
-		docker_img.push('latest')
-		}
-	}	
-     }
-  }
+    stages {
 
-  stage('kube depoly'){
-     steps{
-   sh '''
+        stage('Clone from GitHub') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/mthd-mca/flask-app.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    dockerImage = docker.build("${IMAGE_NAME}:latest")
+                }
+            }
+        }
+
+        stage('Push Image to Docker Hub') {
+            steps {
+                script {
+                    docker.withRegistry('', DOCKERHUB_CREDENTIALS) {
+                        dockerImage.push('latest')
+                    }
+                }
+            }
+        }
+
+        stage('Deploy on Kubernetes (No YAML)') {
+            steps {
+                sh '''
+        
                 kubectl delete deployment flask-app --ignore-not-found
                 kubectl delete service flask-service --ignore-not-found
 
                 kubectl create deployment flask-app \
                   --image=675711/flask-app:latest
 
-                kubectl scale deployment flask-app --replicas=2
-
+                kubectl scale deployment flask-app --replicas=
                 kubectl expose deployment flask-app \
                   --name=flask-service \
                   --type=NodePort \
                   --port=5000 \
                   --target-port=5000
-                '''	
+                '''
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                sh '''
+                kubectl get deployments
+                kubectl get pods
+                kubectl get services
+                '''
+            }
+        }
     }
-   }
 
-   stage('verify'){
-	steps{
-	   sh 'kubectl get pods'
-	   sh 'kubectl get services'
-	 }
-   }
-
-} 
-
+    post {
+        success {
+            echo "Flask CI/CD Pipeline Executed Successfully on Kubernetes (No YAML)"
+        }
+        failure {
+            echo "pipeline Failed"
+        }
+    }
 }
