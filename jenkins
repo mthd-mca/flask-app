@@ -17,7 +17,7 @@ stages{
   stage('build docker'){
    steps{
 	script{
-	  docker_img=docker.build(${img_name}:latest)
+	  docker_img=docker.build("${img_name}:latest")
 	}
     }
   }
