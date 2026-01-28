@@ -4,8 +4,6 @@ pipeline {
     environment {
         IMAGE_NAME = "675711/flask-app"
         DOCKERHUB_CREDENTIALS = 'dockerhub'
-        DEPLOYMENT_NAME = "flask-app"
-        SERVICE_NAME = "flask-service"
     }
 
     stages {
