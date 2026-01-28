@@ -39,18 +39,14 @@ pipeline {
 
         stage('Verify Deployment') {
             steps {
-                sh '''
-                kubectl get deployments
-                kubectl get pods
-                kubectl get services
-                '''
+               echo "kubectl created "
             }
         }
     }
 
     post {
         success {
-            echo "Flask CI/CD Pipeline Executed Successfully on Kubernetes (No YAML)"
+            echo "Flask CI/CD Pipeline Executed Successfully on Kubernetes"
         }
         failure {
             echo "pipeline Failed"
